@@ -1,0 +1,46 @@
+SET
+=== TEST 1: order_total am -> phai bi chan boi check_order_total_non_negative ===
+BEGIN
+psql:/tmp/test_constraints.sql:7: ERROR:  new row for relation "orders" violates check constraint "check_order_total_non_negative"
+DETAIL:  Failing row contains (ORD_TEST01, CUS000001, 2026-07-01 03:00:00+00, pending, null, web, -500000.00, unknown, 2026-09-17 09:41:11.272145+00, 2026-09-17 09:41:11.272145+00, 2026-09-17 09:41:11.272145+00).
+ROLLBACK
+
+=== TEST 2: order_date o tuong lai -> phai bi chan boi check_order_date ===
+BEGIN
+psql:/tmp/test_constraints.sql:14: ERROR:  new row for relation "orders" violates check constraint "check_order_date"
+DETAIL:  Failing row contains (ORD_TEST02, CUS000001, 2030-01-01 03:00:00+00, pending, null, web, 100000.00, unknown, 2026-09-17 09:41:11.273251+00, 2026-09-17 09:41:11.273251+00, 2026-09-17 09:41:11.273251+00).
+ROLLBACK
+
+=== TEST 3: quantity = 0 -> phai bi chan boi check_quantity_positive ===
+BEGIN
+psql:/tmp/test_constraints.sql:21: ERROR:  new row for relation "order_items" violates check constraint "check_quantity_positive"
+DETAIL:  Failing row contains (ITM_TEST03, ORD000001, PRD000001, 0, 100000.00, 0.00, unknown, 2026-09-17 09:41:11.273737+00, 2026-09-17 09:41:11.273737+00, 2026-09-17 09:41:11.273737+00).
+ROLLBACK
+
+=== TEST 4: status khong ton tai -> phai bi chan boi FK toi order_status ===
+BEGIN
+psql:/tmp/test_constraints.sql:28: ERROR:  insert or update on table "orders" violates foreign key constraint "orders_status_fkey"
+DETAIL:  Key (status)=(unknown_status) is not present in table "order_status".
+ROLLBACK
+
+=== TEST 5: email trung -> phai bi chan boi UNIQUE ===
+BEGIN
+psql:/tmp/test_constraints.sql:35: ERROR:  duplicate key value violates unique constraint "customers_email_key"
+DETAIL:  Key (email)=(user0001@example.com) already exists.
+ROLLBACK
+
+=== TEST 6: payment_date < order_date -> phai bi chan boi trigger ===
+BEGIN
+psql:/tmp/test_constraints.sql:43: ERROR:  payment_date (2026-06-11 05:35:00+00) phai >= order_date (2026-06-12 05:35:00+00) cua don ORD000001
+CONTEXT:  PL/pgSQL function fn_check_payment_after_order() line 7 at RAISE
+ROLLBACK
+
+=== TEST 7: INSERT hop le -> phai THANH CONG (DEFAULT NOW() dien audit fields) ===
+BEGIN
+INSERT 0 1
+  order_id  |  status   | order_total | created_at_auto_filled 
+------------+-----------+-------------+------------------------
+ ORD_TEST07 | completed |   250000.00 | t
+(1 row)
+
+ROLLBACK

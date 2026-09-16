@@ -1,0 +1,132 @@
+// =============================================================================
+// E-COMMERCE OLTP - ERD (Module 1 / Session 01)
+// Database: ecommerce | Schema: core | PostgreSQL 16
+//
+// Cach dung: copy toan bo file nay -> https://dbdiagram.io -> khung soan thao
+//            ben trai -> Export > PNG (luu vao docs/evidence/01-erd.png)
+//
+// Quy uoc thiet ke:
+//  - ID: dung ma nghiep vu VARCHAR theo docs/data_contract.md (CUS000001,
+//    ORD000001...) thay vi SERIAL, de giu nguyen khoa tu he thong nguon.
+//  - Tien te: NUMERIC(14,2) - VND, khong dung FLOAT (sai so nhi phan).
+//  - Thoi gian: TIMESTAMPTZ - du lieu nguon co timezone +07:00.
+//  - Audit columns: source_system, ingested_at, created_at, updated_at.
+// =============================================================================
+
+Table order_status {
+  status_code   varchar(20) [pk, note: 'pending|confirmed|shipped|completed|cancelled']
+  status_name   varchar(50) [not null]
+  sort_order    smallint    [not null, note: 'Thu tu vong doi don hang']
+  is_revenue    boolean     [not null, default: false, note: 'Trang thai duoc tinh doanh thu']
+  created_at    timestamptz [not null]
+  updated_at    timestamptz [not null]
+  Note: 'Bang tra cuu (lookup) trang thai don hang. Tach rieng de them/sua trang thai ma khong phai ALTER bang orders.'
+}
+
+Table categories {
+  category_id        varchar(10)  [pk]
+  category_name      varchar(120) [not null]
+  parent_category_id varchar(10)  [note: 'FK tu tham chieu - cay danh muc']
+  source_system      varchar(50)  [not null, default: 'unknown']
+  ingested_at        timestamptz  [not null]
+  created_at         timestamptz  [not null]
+  updated_at         timestamptz  [not null]
+  Note: 'Danh muc san pham, ho tro long nhau qua parent_category_id.'
+}
+
+Table customers {
+  customer_id      varchar(12)  [pk]
+  full_name        varchar(150) [not null]
+  email            varchar(200) [not null, unique]
+  phone            varchar(30)
+  city             varchar(100)
+  customer_segment varchar(30)  [not null, note: 'Standard|Silver|Gold|Platinum']
+  status           varchar(20)  [not null, note: 'active|inactive']
+  source_system    varchar(50)  [not null, default: 'unknown']
+  ingested_at      timestamptz  [not null]
+  created_at       timestamptz  [not null]
+  updated_at       timestamptz  [not null]
+  Note: 'Khach hang. email UNIQUE theo business rule #1.'
+}
+
+Table products {
+  product_id    varchar(12)  [pk]
+  category_id   varchar(10)  [not null]
+  product_name  varchar(200) [not null]
+  unit_price    "numeric(14,2)" [not null, note: 'CHECK >= 0']
+  cost_price    "numeric(14,2)" [not null, note: 'CHECK >= 0']
+  status        varchar(20)  [not null, note: 'active|inactive|discontinued']
+  source_system varchar(50)  [not null, default: 'unknown']
+  ingested_at   timestamptz  [not null]
+  created_at    timestamptz  [not null]
+  updated_at    timestamptz  [not null]
+  Note: 'San pham. Moi san pham thuoc dung 1 category (business rule #2).'
+}
+
+Table orders {
+  order_id      varchar(12)  [pk]
+  customer_id   varchar(12)  [not null]
+  order_date    timestamptz  [not null]
+  status        varchar(20)  [not null, note: 'FK -> order_status.status_code']
+  shipping_city varchar(100)
+  channel       varchar(20)  [not null, note: 'web|mobile_app|social']
+  order_total   "numeric(14,2)" [not null, note: 'CHECK >= 0']
+  source_system varchar(50)  [not null, default: 'unknown']
+  ingested_at   timestamptz  [not null]
+  created_at    timestamptz  [not null]
+  updated_at    timestamptz  [not null]
+  Note: 'Don hang. Moi don thuoc dung 1 khach hang (business rule #3).'
+}
+
+Table order_items {
+  order_item_id   varchar(16)  [pk]
+  order_id        varchar(12)  [not null]
+  product_id      varchar(12)  [not null]
+  quantity        int          [not null, note: 'CHECK > 0']
+  unit_price      "numeric(14,2)" [not null, note: 'Gia tai thoi diem dat - snapshot']
+  discount_amount "numeric(14,2)" [not null, default: 0, note: 'CHECK 0 <= discount <= quantity*unit_price']
+  source_system   varchar(50)  [not null, default: 'unknown']
+  ingested_at     timestamptz  [not null]
+  created_at      timestamptz  [not null]
+  updated_at      timestamptz  [not null]
+  Note: 'Dong hang trong don. Bang noi N-N giua orders va products, co thuoc tinh rieng.'
+}
+
+Table payments {
+  payment_id     varchar(12)  [pk]
+  order_id       varchar(12)  [not null]
+  payment_date   timestamptz  [not null, note: 'Business rule #7: >= orders.order_date']
+  payment_method varchar(30)  [not null, note: 'cash|bank_transfer|card|e_wallet']
+  payment_status varchar(20)  [not null, note: 'pending|success|failed|refunded']
+  amount         "numeric(14,2)" [not null, note: 'CHECK >= 0']
+  source_system  varchar(50)  [not null, default: 'unknown']
+  ingested_at    timestamptz  [not null]
+  created_at     timestamptz  [not null]
+  updated_at     timestamptz  [not null]
+  Note: 'Thanh toan. 1 don co the co 0..N payment (tra gop, retry, refund).'
+}
+
+// =============================================================================
+// QUAN HE (tat ca deu 1:N, doc la "mot ... co nhieu ...")
+// =============================================================================
+
+// 1 category cha co N category con (de quy)
+Ref: categories.parent_category_id > categories.category_id
+
+// 1 category co N san pham
+Ref: products.category_id > categories.category_id
+
+// 1 khach hang co N don hang
+Ref: orders.customer_id > customers.customer_id
+
+// 1 trang thai duoc dung boi N don hang
+Ref: orders.status > order_status.status_code
+
+// 1 don hang co N dong hang (ON DELETE CASCADE)
+Ref: order_items.order_id > orders.order_id
+
+// 1 san pham xuat hien trong N dong hang
+Ref: order_items.product_id > products.product_id
+
+// 1 don hang co N lan thanh toan
+Ref: payments.order_id > orders.order_id

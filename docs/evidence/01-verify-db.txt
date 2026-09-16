@@ -1,0 +1,59 @@
+=== 1. SELECT version(); ===
+                                                       version                                                        
+----------------------------------------------------------------------------------------------------------------------
+ PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+(1 row)
+
+=== 2. SELECT current_database(); ===
+ current_database 
+------------------
+ ecommerce
+(1 row)
+
+=== 3. Danh sach bang trong schema core (phai co 7 bang) ===
+            List of relations
+ Schema |     Name     | Type  |  Owner  
+--------+--------------+-------+---------
+ core   | categories   | table | de_user
+ core   | customers    | table | de_user
+ core   | order_items  | table | de_user
+ core   | order_status | table | de_user
+ core   | orders       | table | de_user
+ core   | payments     | table | de_user
+ core   | products     | table | de_user
+(7 rows)
+
+=== 4. So dong sau khi nap seed data ===
+  table_name  | count 
+--------------+-------
+ categories   |    20
+ customers    |  1000
+ order_items  | 12717
+ orders       |  5000
+ order_status |     5
+ payments     |  4517
+ products     |   500
+(7 rows)
+
+=== 5. Danh sach khoa ngoai (FK) ===
+  bang_con   |       cot_fk       |   bang_cha   |   cot_pk    
+-------------+--------------------+--------------+-------------
+ categories  | parent_category_id | categories   | category_id
+ order_items | order_id           | orders       | order_id
+ order_items | product_id         | products     | product_id
+ orders      | customer_id        | customers    | customer_id
+ orders      | status             | order_status | status_code
+ payments    | order_id           | orders       | order_id
+ products    | category_id        | categories   | category_id
+(7 rows)
+
+=== 6. Danh sach CHECK constraint tu dat ten (phan Bonus) ===
+       bang       |          ten_constraint           |                         dinh_nghia                          
+------------------+-----------------------------------+-------------------------------------------------------------
+ core.orders      | check_order_date                  | CHECK (((order_date IS NULL) OR (order_date <= now())))
+ core.orders      | check_order_total_non_negative    | CHECK ((order_total >= (0)::numeric))
+ core.order_items | check_quantity_positive           | CHECK ((quantity > 0))
+ core.payments    | check_payment_amount_non_negative | CHECK ((amount >= (0)::numeric))
+ core.payments    | check_payment_date                | CHECK (((payment_date IS NULL) OR (payment_date <= now())))
+(5 rows)
+

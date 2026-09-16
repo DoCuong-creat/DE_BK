@@ -1,0 +1,66 @@
+[1/4] Starting PostgreSQL...
+ Container ecommerce-postgres Running 
+[2/4] Resetting CORE/MART...
+DROP SCHEMA
+NOTICE:  schema "mart" does not exist, skipping
+NOTICE:  schema "core" does not exist, skipping
+DROP SCHEMA
+[3/4] Creating OLTP from YOUR student SQL...
+CREATE SCHEMA
+SET
+CREATE TABLE
+INSERT 0 5
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+NOTICE:  constraint "check_order_date" of relation "orders" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+NOTICE:  constraint "check_order_total_non_negative" of relation "orders" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+NOTICE:  constraint "check_quantity_positive" of relation "order_items" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+NOTICE:  constraint "check_payment_amount_non_negative" of relation "payments" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+NOTICE:  constraint "check_payment_date" of relation "payments" does not exist, skipping
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+NOTICE:  trigger "trg_check_payment_after_order" for relation "payments" does not exist, skipping
+DROP TRIGGER
+CREATE TRIGGER
+[4/4] Loading seed data...
+COPY 20
+COPY 1000
+COPY 500
+COPY 5000
+COPY 12717
+COPY 4517
+STUDENT CORE READY. If this fails, fix sql/student/01_create_oltp.sql first.

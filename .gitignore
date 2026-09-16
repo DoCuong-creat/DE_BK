@@ -1,0 +1,21 @@
+# Secrets / config cục bộ
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Runtime artifacts của pipeline
+logs/
+data/raw/
+data/reject/
+reports/*.csv
+metadata/*.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Material của giảng viên (dung lượng lớn, không phải bài làm)
+slides/
