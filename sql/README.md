@@ -61,7 +61,7 @@ docker exec ecommerce-postgres psql -U de_user -d ecommerce -c "SELECT 'orders' 
 Số dòng mong đợi: categories 20, customers 1000, products 500, orders 5000,
 order_items 12717, payments 4517, order_status 5.
 
-Output đầy đủ của bước verify được lưu tại `docs/evidence/01-verify-db.txt`.
+Output đầy đủ của bước verify được lưu tại `docs/evidence/1.1/01-verify-db-full.txt`.
 
 ## Thứ tự phụ thuộc giữa các bảng
 
