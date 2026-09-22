@@ -1,0 +1,89 @@
+Pager usage is off.
+SET
+################################################################
+# 1.1 BASIC QUERIES - Q1..Q5
+# Moi query: 5 dong dau + tong so dong tra ve
+################################################################
+
+=== Q1: orders co order_total > 100 (de bai: total_amount > 100) ===
+ order_id  | customer_id |       order_date       |  status   | order_total 
+-----------+-------------+------------------------+-----------+-------------
+ ORD002478 | CUS000569   | 2026-03-10 09:24:00+00 | pending   | 51170000.00
+ ORD002451 | CUS000213   | 2026-06-14 03:17:00+00 | completed | 50639500.00
+ ORD001740 | CUS000920   | 2026-05-09 01:45:00+00 | completed | 49650000.00
+ ORD004444 | CUS000062   | 2026-05-25 11:11:00+00 | completed | 49494000.00
+ ORD002598 | CUS000046   | 2026-01-27 13:13:00+00 | completed | 48733500.00
+(5 rows)
+
+ row_count 
+-----------
+      5000
+(1 row)
+
+--> Nhan xet: du lieu VND nen moi don deu > 100, dieu kien khong loc duoc gi.
+
+=== Q1b: nguong thuc te order_total > 20.000.000 VND ===
+ order_id  | customer_id |       order_date       |  status   | order_total 
+-----------+-------------+------------------------+-----------+-------------
+ ORD002478 | CUS000569   | 2026-03-10 09:24:00+00 | pending   | 51170000.00
+ ORD002451 | CUS000213   | 2026-06-14 03:17:00+00 | completed | 50639500.00
+ ORD001740 | CUS000920   | 2026-05-09 01:45:00+00 | completed | 49650000.00
+ ORD004444 | CUS000062   | 2026-05-25 11:11:00+00 | completed | 49494000.00
+ ORD002598 | CUS000046   | 2026-01-27 13:13:00+00 | completed | 48733500.00
+(5 rows)
+
+ row_count 
+-----------
+       840
+(1 row)
+
+
+=== Q2: customers chua co don hang nao (LEFT JOIN + IS NULL) ===
+ customer_id |    full_name     |        email         |    city    | customer_segment 
+-------------+------------------+----------------------+------------+------------------
+ CUS000048   | Kelly York       | user0048@example.com | Vinh       | Standard
+ CUS000282   | Joseph Snyder    | user0282@example.com | Hanoi      | Silver
+ CUS000500   | Renee Warren     | user0500@example.com | Can Tho    | Platinum
+ CUS000595   | Richard Gonzalez | user0595@example.com | Hue        | Standard
+ CUS000769   | Robert Montoya   | user0769@example.com | Quang Ninh | Standard
+(5 rows)
+
+ row_count 
+-----------
+         6
+(1 row)
+
+
+=== Q3: Top 10 customers theo tong chi tieu ===
+ customer_id |    full_name    | customer_segment | so_don | tong_chi_tieu 
+-------------+-----------------+------------------+--------+---------------
+ CUS000575   | Jessica Marquez | Gold             |     15 |  209701000.00
+ CUS000304   | Roberto Moon    | Standard         |     12 |  191320000.00
+ CUS000852   | Alfred Hubbard  | Standard         |     12 |  187823500.00
+ CUS000736   | Gordon Rogers   | Standard         |     13 |  180159000.00
+ CUS000305   | Lisa Patterson  | Standard         |     12 |  177303000.00
+ CUS000287   | Michele Dixon   | Standard         |     13 |  176969500.00
+ CUS000336   | Wayne Martinez  | Standard         |     11 |  175471500.00
+ CUS000646   | Ashley Small    | Standard         |     10 |  166109500.00
+ CUS000475   | Carla Lee       | Standard         |      8 |  164104000.00
+ CUS000271   | Cindy Blair     | Standard         |     10 |  160608500.00
+(10 rows)
+
+
+=== Q4: So customers khac nhau co don hang ===
+ so_customer_co_don | tong_so_customer 
+--------------------+------------------
+                994 |             1000
+(1 row)
+
+
+=== Q5: 5 orders moi nhat theo order_date ===
+ order_id  | customer_id |       order_date       |  status   |  channel   | order_total 
+-----------+-------------+------------------------+-----------+------------+-------------
+ ORD000412 | CUS000573   | 2026-06-29 15:51:00+00 | completed | web        | 11847000.00
+ ORD001049 | CUS000336   | 2026-06-29 15:38:00+00 | completed | social     | 17109000.00
+ ORD004705 | CUS000262   | 2026-06-29 15:24:00+00 | completed | mobile_app |  1790000.00
+ ORD000417 | CUS000196   | 2026-06-29 13:46:00+00 | completed | web        | 20886000.00
+ ORD002732 | CUS000408   | 2026-06-29 12:34:00+00 | completed | mobile_app |  4012000.00
+(5 rows)
+

@@ -1,0 +1,50 @@
+Pager usage is off.
+SET
+=== Bao dam index chua ton tai truoc khi do ===
+psql:/tmp/ev_explain.sql:4: NOTICE:  index "idx_orders_shipping_city" does not exist, skipping
+DROP INDEX
+ANALYZE
+
+################ TRUOC KHI CO INDEX ################
+                                              QUERY PLAN                                               
+-------------------------------------------------------------------------------------------------------
+ Seq Scan on orders  (cost=0.00..153.00 rows=376 width=34) (actual time=0.004..0.261 rows=384 loops=1)
+   Filter: (((shipping_city)::text = 'Hue'::text) AND ((status)::text = 'completed'::text))
+   Rows Removed by Filter: 4616
+   Buffers: shared hit=78
+ Planning:
+   Buffers: shared hit=44
+ Planning Time: 0.098 ms
+ Execution Time: 0.289 ms
+(8 rows)
+
+
+################ TAO INDEX ################
+CREATE INDEX
+ANALYZE
+
+################ SAU KHI CO INDEX ################
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on orders  (cost=8.01..93.27 rows=376 width=34) (actual time=0.065..0.174 rows=384 loops=1)
+   Recheck Cond: ((shipping_city)::text = 'Hue'::text)
+   Filter: ((status)::text = 'completed'::text)
+   Rows Removed by Filter: 100
+   Heap Blocks: exact=78
+   Buffers: shared hit=78 read=3
+   ->  Bitmap Index Scan on idx_orders_shipping_city  (cost=0.00..7.91 rows=484 width=0) (actual time=0.052..0.052 rows=484 loops=1)
+         Index Cond: ((shipping_city)::text = 'Hue'::text)
+         Buffers: shared read=3
+ Planning:
+   Buffers: shared hit=32 read=1
+ Planning Time: 0.119 ms
+ Execution Time: 0.208 ms
+(13 rows)
+
+
+=== So dong tra ve / tong so dong bang orders ===
+ so_dong_khop | tong_so_dong 
+--------------+--------------
+          384 |         5000
+(1 row)
+

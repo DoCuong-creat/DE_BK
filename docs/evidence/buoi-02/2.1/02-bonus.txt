@@ -1,0 +1,56 @@
+Pager usage is off.
+SET
+################################################################
+# Bonus 2.1 - ADVANCED ANALYTICS
+################################################################
+
+=== Query 1: Cumulative revenue theo thang ===
+   thang    |   doanh_thu   | doanh_thu_luy_ke 
+------------+---------------+------------------
+ 2026-01-01 | 8231711000.00 |    8231711000.00
+ 2026-02-01 | 7058655000.00 |   15290366000.00
+ 2026-03-01 | 8998721500.00 |   24289087500.00
+ 2026-04-01 | 7801828500.00 |   32090916000.00
+ 2026-05-01 | 8230727000.00 |   40321643000.00
+ 2026-06-01 | 7756301000.00 |   48077944000.00
+(6 rows)
+
+
+=== Query 2: Ty trong doanh thu tung category (10 dong dau) ===
+ category_id | category_name |   doanh_thu   | ty_trong_pct | ty_trong_luy_ke_pct 
+-------------+---------------+---------------+--------------+---------------------
+ CAT012      | Skincare      | 4776238500.00 |         9.93 |                9.93
+ CAT009      | Kitchen       | 4192039000.00 |         8.72 |               18.65
+ CAT006      | Phones        | 3818082500.00 |         7.94 |               26.60
+ CAT015      | Fitness       | 3648597000.00 |         7.59 |               34.18
+ CAT014      | Personal Care | 3518033500.00 |         7.32 |               41.50
+ CAT011      | Home Decor    | 3289578000.00 |         6.84 |               48.34
+ CAT018      | Technology    | 3020981000.00 |         6.28 |               54.63
+ CAT013      | Makeup        | 3013922500.00 |         6.27 |               60.90
+ CAT016      | Outdoor       | 2873363500.00 |         5.98 |               66.87
+ CAT017      | Sportswear    | 2816603500.00 |         5.86 |               72.73
+(10 rows)
+
+
+=== Query 3: Customers churn - khong mua trong 30 ngay (10 dong dau) ===
+ customer_id |    full_name     | customer_segment | lan_mua_cuoi | moc_doi_chieu | so_ngay_khong_mua | so_don | tong_chi_tieu 
+-------------+------------------+------------------+--------------+---------------+-------------------+--------+---------------
+ CUS000243   | Jeffery Miles    | Standard         | 2026-01-09   | 2026-06-29    |               171 |      1 |    6184500.00
+ CUS000732   | Cesar Cochran    | Standard         | 2026-01-14   | 2026-06-29    |               166 |      2 |   36948000.00
+ CUS000564   | Mr. Cody Mcclure | Platinum         | 2026-01-18   | 2026-06-29    |               162 |      1 |   14295500.00
+ CUS000725   | Laura Nelson     | Platinum         | 2026-01-20   | 2026-06-29    |               159 |      1 |    8037000.00
+ CUS000457   | Matthew Wilson   | Standard         | 2026-01-23   | 2026-06-29    |               157 |      1 |    1170000.00
+ CUS000807   | Natasha Lee      | Standard         | 2026-02-10   | 2026-06-29    |               139 |      1 |    6593500.00
+ CUS000651   | Aaron Bautista   | Standard         | 2026-02-14   | 2026-06-29    |               135 |      1 |    2060000.00
+ CUS000371   | Brianna Beasley  | Standard         | 2026-02-16   | 2026-06-29    |               133 |      2 |   40470000.00
+ CUS000515   | Bryan Stevens    | Standard         | 2026-02-20   | 2026-06-29    |               129 |      4 |   35291000.00
+ CUS000313   | Christopher Page | Standard         | 2026-02-21   | 2026-06-29    |               128 |      2 |   47606000.00
+(10 rows)
+
+
+=== Tong so khach churn / tong so khach co don ===
+ so_khach_churn | tong_khach_co_don | churn_rate_pct 
+----------------+-------------------+----------------
+            432 |               994 |          43.46
+(1 row)
+

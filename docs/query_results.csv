@@ -1,0 +1,34 @@
+# BANG 1: Doanh thu theo thang (orders.status = completed)
+thang,so_don,doanh_thu
+2026-01-01,654,8231711000.00
+2026-02-01,590,7058655000.00
+2026-03-01,712,8998721500.00
+2026-04-01,623,7801828500.00
+2026-05-01,675,8230727000.00
+2026-06-01,626,7756301000.00
+
+# BANG 2: Doanh thu theo category (revenue net, orders.status = completed)
+category_id,category_name,so_don,so_luong_ban,doanh_thu
+CAT012,Skincare,824,1217,4776238500.00
+CAT009,Kitchen,813,1163,4192039000.00
+CAT006,Phones,675,967,3818082500.00
+CAT015,Fitness,587,819,3648597000.00
+CAT014,Personal Care,604,818,3518033500.00
+CAT011,Home Decor,680,978,3289578000.00
+CAT018,Technology,667,962,3020981000.00
+CAT013,Makeup,672,946,3013922500.00
+CAT016,Outdoor,630,879,2873363500.00
+CAT017,Sportswear,501,685,2816603500.00
+CAT007,Computers,625,871,2810318000.00
+CAT008,Accessories,558,771,2809430000.00
+CAT010,Furniture,525,727,2726178000.00
+CAT019,Business,485,660,2460435500.00
+CAT020,Lifestyle,426,566,2304143500.00
+
+# BANG 3: So don theo trang thai
+status,so_don,ty_trong_pct
+completed,3880,77.60
+shipped,461,9.22
+confirmed,266,5.32
+cancelled,246,4.92
+pending,147,2.94

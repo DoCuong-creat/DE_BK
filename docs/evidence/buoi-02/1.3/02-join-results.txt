@@ -1,0 +1,66 @@
+Pager usage is off.
+SET
+################################################################
+# 1.3 JOIN OPERATIONS - Q11..Q15
+################################################################
+
+=== Q11: Orders kem customer_name, customer_email (5 dong dau) ===
+ order_id  |       order_date       |  status   | order_total |    customer_name    |    customer_email    
+-----------+------------------------+-----------+-------------+---------------------+----------------------
+ ORD000412 | 2026-06-29 15:51:00+00 | completed | 11847000.00 | Alexandra Davenport | user0573@example.com
+ ORD001049 | 2026-06-29 15:38:00+00 | completed | 17109000.00 | Wayne Martinez      | user0336@example.com
+ ORD004705 | 2026-06-29 15:24:00+00 | completed |  1790000.00 | Charles Riggs       | user0262@example.com
+ ORD000417 | 2026-06-29 13:46:00+00 | completed | 20886000.00 | Christopher Cochran | user0196@example.com
+ ORD002732 | 2026-06-29 12:34:00+00 | completed |  4012000.00 | Kristen Smith       | user0408@example.com
+(5 rows)
+
+ row_count 
+-----------
+      5000
+(1 row)
+
+
+=== Q12: order_items kem product_name, unit_price (5 dong dau) ===
+ order_item_id | order_id  |    product_name     | quantity | unit_price | discount_amount | thanh_tien  
+---------------+-----------+---------------------+----------+------------+-----------------+-------------
+ ITM00000001   | ORD000001 | Product 400 Theory  |        1 |  700000.00 |            0.00 |   700000.00
+ ITM00000002   | ORD000002 | Product 046 College |        1 | 3140000.00 |       471000.00 |  2669000.00
+ ITM00000003   | ORD000003 | Product 042 Unit    |        2 | 5120000.00 |            0.00 | 10240000.00
+ ITM00000004   | ORD000004 | Product 163 Indeed  |        1 |  840000.00 |        42000.00 |   798000.00
+ ITM00000005   | ORD000004 | Product 050 Get     |        1 |  180000.00 |            0.00 |   180000.00
+(5 rows)
+
+ row_count 
+-----------
+     12717
+(1 row)
+
+
+=== Q13: Orders co payment nhung KHONG co order_item (LEFT JOIN + IS NULL) ===
+ order_id | order_date | status | order_total 
+----------+------------+--------+-------------
+(0 rows)
+
+ row_count 
+-----------
+         0
+(1 row)
+
+
+=== Q13b: Nguoc lai - orders KHONG co payment nao ===
+ row_count 
+-----------
+       483
+(1 row)
+
+
+=== Q14: Products chua tung duoc ban ===
+ product_id | product_name | unit_price | status 
+------------+--------------+------------+--------
+(0 rows)
+
+ row_count 
+-----------
+         0
+(1 row)
+
