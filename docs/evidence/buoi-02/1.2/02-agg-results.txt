@@ -1,0 +1,99 @@
+Pager usage is off.
+SET
+################################################################
+# 1.2 AGGREGATE & GROUPING - Q6..Q10
+################################################################
+
+=== Q6: Tong doanh thu theo thang (don completed) ===
+   thang    | so_don |   doanh_thu   
+------------+--------+---------------
+ 2026-01-01 |    654 | 8231711000.00
+ 2026-02-01 |    590 | 7058655000.00
+ 2026-03-01 |    712 | 8998721500.00
+ 2026-04-01 |    623 | 7801828500.00
+ 2026-05-01 |    675 | 8230727000.00
+ 2026-06-01 |    626 | 7756301000.00
+(6 rows)
+
+
+=== Q7: AOV theo tung customer (top 10) ===
+ customer_id | so_don |  aov_khach  
+-------------+--------+-------------
+ CUS000881   |      1 | 30297500.00
+ CUS000213   |      2 | 29129250.00
+ CUS000156   |      1 | 28950000.00
+ CUS000345   |      2 | 28393500.00
+ CUS000621   |      5 | 24788900.00
+ CUS000579   |      1 | 24768500.00
+ CUS000046   |      3 | 24737000.00
+ CUS000766   |      2 | 24204000.00
+ CUS000313   |      2 | 23803000.00
+ CUS000887   |      3 | 23657333.33
+(10 rows)
+
+ tong_so_nhom 
+--------------
+          994
+(1 row)
+
+
+=== Q8: So don theo order_status ===
+  status   | so_don | ty_trong_pct 
+-----------+--------+--------------
+ completed |   3880 |        77.60
+ shipped   |    461 |         9.22
+ confirmed |    266 |         5.32
+ cancelled |    246 |         4.92
+ pending   |    147 |         2.94
+(5 rows)
+
+
+=== Q9: Doanh thu theo category (don completed, revenue net) ===
+ category_id | category_name | so_don | so_luong_ban |   doanh_thu   
+-------------+---------------+--------+--------------+---------------
+ CAT012      | Skincare      |    824 |         1217 | 4776238500.00
+ CAT009      | Kitchen       |    813 |         1163 | 4192039000.00
+ CAT006      | Phones        |    675 |          967 | 3818082500.00
+ CAT015      | Fitness       |    587 |          819 | 3648597000.00
+ CAT014      | Personal Care |    604 |          818 | 3518033500.00
+ CAT011      | Home Decor    |    680 |          978 | 3289578000.00
+ CAT018      | Technology    |    667 |          962 | 3020981000.00
+ CAT013      | Makeup        |    672 |          946 | 3013922500.00
+ CAT016      | Outdoor       |    630 |          879 | 2873363500.00
+ CAT017      | Sportswear    |    501 |          685 | 2816603500.00
+ CAT007      | Computers     |    625 |          871 | 2810318000.00
+ CAT008      | Accessories   |    558 |          771 | 2809430000.00
+ CAT010      | Furniture     |    525 |          727 | 2726178000.00
+ CAT019      | Business      |    485 |          660 | 2460435500.00
+ CAT020      | Lifestyle     |    426 |          566 | 2304143500.00
+(15 rows)
+
+
+=== Q10: HAVING doanh thu > 1000 (nguong cua de bai) ===
+ so_category_thoa 
+------------------
+               15
+(1 row)
+
+--> Nhan xet: 15/15 category co ban hang deu vuot nguong 1000 VND nen HAVING khong loc duoc gi. (CAT001-CAT005 la category goc, khong gan san pham nao nen khong xuat hien.)
+
+=== Q10b: HAVING doanh thu > 1.000.000.000 VND (nguong thuc te) ===
+ category_name |   doanh_thu   
+---------------+---------------
+ Skincare      | 4776238500.00
+ Kitchen       | 4192039000.00
+ Phones        | 3818082500.00
+ Fitness       | 3648597000.00
+ Personal Care | 3518033500.00
+ Home Decor    | 3289578000.00
+ Technology    | 3020981000.00
+ Makeup        | 3013922500.00
+ Outdoor       | 2873363500.00
+ Sportswear    | 2816603500.00
+ Computers     | 2810318000.00
+ Accessories   | 2809430000.00
+ Furniture     | 2726178000.00
+ Business      | 2460435500.00
+ Lifestyle     | 2304143500.00
+(15 rows)
+

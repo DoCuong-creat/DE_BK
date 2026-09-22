@@ -1,0 +1,92 @@
+Pager usage is off.
+SET
+################################################################
+# 1.4 BUSINESS QUESTIONS - B1..B5
+# Dinh nghia revenue: don status = completed (theo business_requirements.md)
+################################################################
+
+=== B1: Total revenue thang 7/2026 ===
+ revenue_thang_07_2026 | so_don 
+-----------------------+--------
+                     0 |      0
+(1 row)
+
+--- Kiem chung pham vi du lieu hien co: ---
+  ngay_dau  | ngay_cuoi  | tong_don 
+------------+------------+----------
+ 2026-01-01 | 2026-06-29 |     5000
+(1 row)
+
+--- Doanh thu thang 6/2026 de doi chieu: ---
+ revenue_thang_06_2026 | so_don 
+-----------------------+--------
+         7756301000.00 |    626
+(1 row)
+
+
+=== B2: Customer co tong chi tieu cao nhat ===
+ customer_id |    full_name    | customer_segment | so_don | tong_chi_tieu 
+-------------+-----------------+------------------+--------+---------------
+ CUS000575   | Jessica Marquez | Gold             |     15 |  209701000.00
+ CUS000304   | Roberto Moon    | Standard         |     12 |  191320000.00
+ CUS000852   | Alfred Hubbard  | Standard         |     12 |  187823500.00
+(3 rows)
+
+--- Chi tinh don completed: ---
+ customer_id |   full_name   | so_don | tong_chi_tieu_completed 
+-------------+---------------+--------+-------------------------
+ CUS000736   | Gordon Rogers |     10 |            173654000.00
+ CUS000475   | Carla Lee     |      8 |            164104000.00
+ CUS000271   | Cindy Blair   |      9 |            150793500.00
+(3 rows)
+
+
+=== B3: Category co so orders cao nhat ===
+ category_id | category_name | so_don 
+-------------+---------------+--------
+ CAT009      | Kitchen       |   1046
+ CAT012      | Skincare      |   1039
+ CAT006      | Phones        |    883
+ CAT013      | Makeup        |    859
+ CAT011      | Home Decor    |    858
+(5 rows)
+
+
+=== B4: Average Order Value (AOV) ===
+ aov_completed | so_don_completed | tong_doanh_thu 
+---------------+------------------+----------------
+   12391222.68 |             3880 | 48077944000.00
+(1 row)
+
+--- AOV tren toan bo don (moi trang thai): ---
+ aov_tat_ca  | so_don 
+-------------+--------
+ 12341286.40 |   5000
+(1 row)
+
+
+=== B5: So customers co HON 3 orders ===
+ so_customer_tren_3_don 
+------------------------
+                    719
+(1 row)
+
+--- Phan bo so don / khach (de doi chieu): ---
+ so_don | so_khach 
+--------+----------
+      1 |       32
+      2 |       88
+      3 |      155
+      4 |      170
+      5 |      176
+      6 |      141
+      7 |       91
+      8 |       57
+      9 |       48
+     10 |       17
+     11 |        9
+     12 |        5
+     13 |        4
+     15 |        1
+(14 rows)
+

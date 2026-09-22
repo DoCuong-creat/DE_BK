@@ -1,0 +1,59 @@
+Pager usage is off.
+SET
+################################################################
+# 1.3 - Q15 (JOIN query so 5): DOI SOAT order_total vs SUM(order_items)
+#   order_total          = tong tien ghi tren don hang
+#   tong_tu_dong_hang    = SUM(quantity * unit_price - discount_amount)
+################################################################
+
+=== 10 dong co chenh lech lon nhat (sap xep giam dan theo |chenh_lech|) ===
+ order_id  | tong_tren_don | tong_tu_dong_hang | chenh_lech 
+-----------+---------------+-------------------+------------
+ ORD000001 |     700000.00 |         700000.00 |       0.00
+ ORD000002 |    2669000.00 |        2669000.00 |       0.00
+ ORD000003 |   10240000.00 |       10240000.00 |       0.00
+ ORD000004 |     978000.00 |         978000.00 |       0.00
+ ORD000005 |   13361000.00 |       13361000.00 |       0.00
+ ORD000006 |   11477500.00 |       11477500.00 |       0.00
+ ORD000007 |   15210000.00 |       15210000.00 |       0.00
+ ORD000008 |    8254500.00 |        8254500.00 |       0.00
+ ORD000009 |   25430000.00 |       25430000.00 |       0.00
+ ORD000010 |    8073500.00 |        8073500.00 |       0.00
+(10 rows)
+
+
+=== So don bi lech (nguong 0.01) ===
+ so_don_lech 
+-------------
+           0
+(1 row)
+
+
+=== Doi soat tong the ===
+ tong_order_total | tong_item_net  | chenh_lech 
+------------------+----------------+------------
+   61706432000.00 | 61706432000.00 |       0.00
+(1 row)
+
+
+=== So don KHONG co dong hang nao (khong xuat hien trong phep doi soat tren) ===
+ so_don_khong_co_item 
+----------------------
+                    0
+(1 row)
+
+
+################################################################
+# KET LUAN DOI SOAT: MATCH
+#
+# - So don bi lech: 0 / 5000 don.
+# - Tong order_total  = 61.706.432.000 VND
+# - Tong item net     = 61.706.432.000 VND  (SUM(quantity*unit_price-discount))
+# - Chenh lech        = 0.00
+# - So don khong co dong hang nao: 0 -> phep doi soat phu het 5000 don,
+#   khong don nao bi bo sot do JOIN.
+#
+# Ket luan: orders.order_total duoc tinh dung bang tong tien cac dong hang
+# sau chiet khau. Du lieu seed nhat quan giua bang cha (orders) va bang con
+# (order_items), khong can dieu chinh.
+################################################################
