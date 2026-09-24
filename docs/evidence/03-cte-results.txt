@@ -1,0 +1,68 @@
+-- Chạy lúc 2026-09-24 17:59 | PostgreSQL 16 (ecommerce-postgres) | schema core
+-- Nguồn: sql/student/03_cte_window_cohort.sql
+
+=== CTE1: Top 10 customers theo total spending.
+ customer_id |    full_name    | customer_segment | order_count | total_spending 
+-------------+-----------------+------------------+-------------+----------------
+ CUS000575   | Jessica Marquez | Gold             |          15 |   209701000.00
+ CUS000736   | Gordon Rogers   | Standard         |          13 |   180159000.00
+ CUS000287   | Michele Dixon   | Standard         |          13 |   176969500.00
+ CUS000305   | Lisa Patterson  | Standard         |          11 |   167887500.00
+ CUS000646   | Ashley Small    | Standard         |          10 |   166109500.00
+ CUS000475   | Carla Lee       | Standard         |           8 |   164104000.00
+ CUS000304   | Roberto Moon    | Standard         |          11 |   161519000.00
+ CUS000271   | Cindy Blair     | Standard         |          10 |   160608500.00
+ CUS000276   | Nicole Jenkins  | Standard         |          11 |   154124000.00
+ CUS000286   | Tara Simmons    | Standard         |           8 |   153034000.00
+Row count: 10
+
+=== CTE2: Phân tầng khách Low / Medium / High bằng CASE WHEN trên CTE.
+ spending_tier | customer_count | customer_pct | min_spending | avg_spending | max_spending 
+---------------+----------------+--------------+--------------+--------------+--------------
+ Low           |            439 |        44.48 |    551000.00 |     30349095 |  49968000.00
+ Medium        |            429 |        43.47 |  50030000.00 |     71910709 |  99990000.00
+ High          |            119 |        12.06 | 100137000.00 |    122246168 | 209701000.00
+Row count: 3
+
+=== CTE3: Nested CTEs - orders_per_customer -> customer_stats.
+ customer_id | order_count | max_orders | avg_orders | min_orders | diff_vs_avg 
+-------------+-------------+------------+------------+------------+-------------
+ CUS000575   |          15 |         15 |       4.82 |          1 |       10.18
+ CUS000287   |          13 |         15 |       4.82 |          1 |        8.18
+ CUS000736   |          13 |         15 |       4.82 |          1 |        8.18
+ CUS000786   |          13 |         15 |       4.82 |          1 |        8.18
+ CUS000705   |          12 |         15 |       4.82 |          1 |        7.18
+ CUS000276   |          11 |         15 |       4.82 |          1 |        6.18
+ CUS000304   |          11 |         15 |       4.82 |          1 |        6.18
+ CUS000305   |          11 |         15 |       4.82 |          1 |        6.18
+ CUS000434   |          11 |         15 |       4.82 |          1 |        6.18
+ CUS000531   |          11 |         15 |       4.82 |          1 |        6.18
+... (977 dòng nữa)
+Row count: 987
+
+=== CTE4: AOV mỗi customer = total_spending / order_count.
+ customer_id | order_count | total_spending |   aov    
+-------------+-------------+----------------+----------
+ CUS000881   |           1 |    30297500.00 | 30297500
+ CUS000213   |           2 |    58258500.00 | 29129250
+ CUS000156   |           1 |    28950000.00 | 28950000
+ CUS000345   |           2 |    56787000.00 | 28393500
+ CUS000491   |           2 |    50529000.00 | 25264500
+ CUS000370   |           2 |    50030000.00 | 25015000
+ CUS000621   |           5 |   123944500.00 | 24788900
+ CUS000046   |           3 |    74211000.00 | 24737000
+ CUS000766   |           2 |    48408000.00 | 24204000
+ CUS000887   |           3 |    70972000.00 | 23657333
+... (977 dòng nữa)
+Row count: 987
+
+=== CTE5: Retention đơn giản - % khách của mỗi cohort quay lại mua ở tháng kế tiếp.
+ cohort_month | cohort_size | returned_next_month | retention_m1_pct 
+--------------+-------------+---------------------+------------------
+ 2026-01-01   |         540 |                 290 |            53.70
+ 2026-02-01   |         235 |                 126 |            53.62
+ 2026-03-01   |         137 |                  74 |            54.01
+ 2026-04-01   |          44 |                  26 |            59.09
+ 2026-05-01   |          22 |                  11 |            50.00
+ 2026-06-01   |           9 |                   0 |                 
+Row count: 6
