@@ -5,7 +5,8 @@ Thư mục được chia theo buổi học, bên trong đặt tên theo **số m
 ```
 docs/evidence/
 ├── buoi-01/   1.1 1.2 1.3 1.4 2.1 2.2
-└── buoi-02/   1.1 1.2 1.3 1.4 2.1 2.2
+├── buoi-02/   1.1 1.2 1.3 1.4 2.1 2.2
+└── 03-*       buổi 03 đặt thẳng trong docs/evidence/ theo đúng đường dẫn đề bài
 ```
 
 Một số artifact đề bài chỉ định đường dẫn cố định ngoài `docs/evidence/`
@@ -51,6 +52,28 @@ Một số artifact đề bài chỉ định đường dẫn cố định ngoài
 | 2.1 | Output | `buoi-02/2.1/02-bonus.txt` |
 | 2.2 | Giải thích INDEX + EXPLAIN trước/sau | `../explain_output/02-explain.md` |
 | 2.2 | Output EXPLAIN thô | `buoi-02/2.2/02-explain-raw.txt` |
+
+## Buổi 03 — SQL nâng cao: Customer Analytics & Cohort
+
+Toàn bộ query nằm trong `../../sql/student/03_cte_window_cohort.sql`, tìm theo comment nhãn.
+
+| Mục | Yêu cầu | File |
+|---|---|---|
+| 1.1 | 5 queries CTE (`-- CTE1` … `-- CTE5`, CTE3 là nested) | `../../sql/student/03_cte_window_cohort.sql` |
+| 1.1 | Output 10 dòng đầu + row count | `03-cte-results.txt` |
+| 1.2 | 5 window queries (`-- W1` … `-- W5`) + giải thích RANK vs DENSE_RANK ở W2 | `../../sql/student/03_cte_window_cohort.sql` |
+| 1.2 | Output 5 dòng đầu mỗi query | `03-window-results.txt` |
+| 1.3 | Query RFM (`-- RFM`) | `../../sql/student/03_cte_window_cohort.sql` |
+| 1.3 | CSV RFM đủ 987 khách | `../customer_rfm.csv` |
+| 1.3 | *(bổ sung)* Output 20 dòng đầu | `03-rfm-results.txt` |
+| 1.4 | Query cohort (`-- Cohort`) | `../../sql/student/03_cte_window_cohort.sql` |
+| 1.4 | CSV retention (`cohort_month,m0..m5,cohort_size`) | `../cohort_retention.csv` |
+| 1.4 | Ảnh heatmap | `03-cohort.png` |
+| 1.4 | Reflection | `../reflection_03.md` |
+| 2.1 | Query `-- Bonus RFM` (NTILE 1-5, rfm_segment, LTV) | `../../sql/student/03_cte_window_cohort.sql` |
+| 2.1 | CSV mẫu 20 dòng | `03-rfm-segments.csv` |
+| 2.2 | Query `-- Bonus timeseries 1/2` (MoM, MA 7/30 ngày) | `../../sql/student/03_cte_window_cohort.sql` |
+| 2.2 | Output + nhận xét tháng tăng/giảm mạnh | `03-timeseries.txt` |
 
 ---
 

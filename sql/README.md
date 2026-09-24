@@ -9,6 +9,7 @@ script trước tạo ra.
 | 1 | `student/01_create_oltp.sql` | 01 | Tạo schema `core` (OLTP normalized) + seed bảng tra cứu `order_status` |
 | 2 | `student/02_exercises_basic.sql` | 02 | Truy vấn SQL cơ bản |
 | 3 | `student/03_exercises_advanced.sql` | 03 | Truy vấn nâng cao cho KPI |
+| 3 | `student/03_cte_window_cohort.sql` | 03 | CTE, window functions, RFM, cohort retention |
 | 4 | `student/04_data_mart.sql` | 04 | Star schema cho `mart` |
 
 ## Bước 1 — Khởi động database
