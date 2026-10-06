@@ -1,0 +1,29 @@
+-- Chạy lúc 2026-10-06 17:08 | PostgreSQL 16 (ecommerce-postgres) | schema mart (mới tạo, sau DROP SCHEMA mart CASCADE)
+-- Lệnh: docker exec -i ecommerce-postgres psql -U de_user -d ecommerce -v ON_ERROR_STOP=1 < sql/student/04_data_mart.sql
+-- Kết quả: 6 CREATE TABLE, 0 ERROR
+
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+TRUNCATE TABLE
+INSERT 0 180
+INSERT 0 1000
+INSERT 0 500
+INSERT 0 5
+INSERT 0 5
+INSERT 0 12717
+ANALYZE
+
+-- grep ERROR: 0 dòng | grep 'CREATE TABLE': 6 dòng

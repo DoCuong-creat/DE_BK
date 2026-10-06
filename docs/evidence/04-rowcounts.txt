@@ -1,0 +1,59 @@
+-- Chạy lúc 2026-10-06 17:08 | PostgreSQL 16 (ecommerce-postgres) | schema core -> mart
+-- Nguồn: phần VERIFY 1-5 cuối file sql/student/04_data_mart.sql
+
+TÓM TẮT
+dim_date=180, dim_customer=1000, dim_product=500, dim_payment_method=5, dim_order_status=5, fact_sales=12717
+oltp_revenue=61706432000.00, mart_revenue=61706432000.00, diff=0.00
+  vì core.orders.order_total đã là số NET = SUM(quantity*unit_price - discount_amount) của order_items
+  (kiểm tra từng đơn: 0/5000 đơn lệch), và fact_sales load đủ 12717/12717 order_items của mọi trạng thái.
+  Nếu so với gross (chưa trừ discount): mart_gross=65562040000.00 -> chênh 3855608000.00 = đúng SUM(discount).
+  Nếu chỉ tính doanh thu ghi nhận (completed): 48077944000.00 ở cả 2 phía, diff=0.00.
+  Không có chênh lệch do rounding vì tiền lưu NUMERIC(…,2), không dùng FLOAT.
+
+=== VERIFY 1: row counts mart vs nguồn
+     table_name     | mart_rows | source_rows
+--------------------+-----------+-------------
+ dim_date           |       180 |         180
+ dim_customer       |      1000 |        1000
+ dim_product        |       500 |         500
+ dim_payment_method |         5 |           5
+ dim_order_status   |         5 |           5
+ fact_sales         |     12717 |       12717
+(6 rows)
+
+Ghi chú:
+- dim_date: 180 ngày liên tục 2026-01-01 -> 2026-06-29 (giờ VN), = MAX - MIN + 1.
+- dim_payment_method: 4 phương thức trong core.payments + 1 dòng 'unknown'.
+- fact_sales: 1 dòng / order_item -> bằng đúng COUNT(*) core.order_items.
+
+=== VERIFY 2: đối soát tổng doanh thu OLTP <-> Mart
+ oltp_orders | mart_orders |  oltp_revenue  |  mart_revenue  | diff |   mart_gross   | mart_discount | gross_minus_net
+-------------+-------------+----------------+----------------+------+----------------+---------------+-----------------
+        5000 |        5000 | 61706432000.00 | 61706432000.00 | 0.00 | 65562040000.00 | 3855608000.00 |   3855608000.00
+(1 row)
+
+=== VERIFY 3: đối soát theo trạng thái đơn
+ status_code | is_revenue |  oltp_revenue  |  mart_revenue  | diff
+-------------+------------+----------------+----------------+------
+ pending     | f          |  1835276500.00 |  1835276500.00 | 0.00
+ confirmed   | f          |  3129764500.00 |  3129764500.00 | 0.00
+ shipped     | f          |  5677255500.00 |  5677255500.00 | 0.00
+ completed   | t          | 48077944000.00 | 48077944000.00 | 0.00
+ cancelled   | f          |  2986191500.00 |  2986191500.00 | 0.00
+(5 rows)
+
+=== VERIFY 4: số đơn có SUM(fact.revenue) <> orders.order_total
+ orders_mismatch
+-----------------
+               0
+(1 row)
+
+=== VERIFY 5: phân bổ payment method (483 đơn chưa có payment -> 'unknown')
+ payment_method_code | orders | fact_rows
+---------------------+--------+-----------
+ bank_transfer       |   1127 |      2887
+ card                |   1127 |      2886
+ cash                |   1114 |      2762
+ e_wallet            |   1149 |      2937
+ unknown             |    483 |      1245
+(5 rows)

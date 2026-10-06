@@ -1,0 +1,119 @@
+-- Chạy lúc 2026-10-06 17:09 | schema mart | nguồn: sql/student/04_kpi_from_mart.sql
+
+SET search_path TO mart;
+SET
+SELECT d.year_month,
+       COUNT(DISTINCT f.order_id) AS orders,
+       SUM(f.revenue)             AS revenue
+FROM fact_sales f
+JOIN dim_date d         ON d.date_key = f.date_key
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue
+GROUP BY d.year_month
+ORDER BY d.year_month;
+ year_month | orders |    revenue    
+------------+--------+---------------
+ 2026-01    |    654 | 8231711000.00
+ 2026-02    |    590 | 7058655000.00
+ 2026-03    |    712 | 8998721500.00
+ 2026-04    |    623 | 7801828500.00
+ 2026-05    |    675 | 8230727000.00
+ 2026-06    |    626 | 7756301000.00
+(6 rows)
+
+SELECT p.parent_category                                      AS category,
+       SUM(f.revenue)                                         AS revenue,
+       ROUND(100.0 * SUM(f.revenue) / SUM(SUM(f.revenue)) OVER (), 2) AS pct_of_total
+FROM fact_sales f
+JOIN dim_product p      ON p.product_key = f.product_key
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue
+GROUP BY p.parent_category
+ORDER BY revenue DESC;
+   category    |    revenue     | pct_of_total 
+---------------+----------------+--------------
+ Beauty        | 11308194500.00 |        23.52
+ Home & Living | 10207795000.00 |        21.23
+ Electronics   |  9437830500.00 |        19.63
+ Sports        |  9338564000.00 |        19.42
+ Books         |  7785560000.00 |        16.19
+(5 rows)
+
+SELECT p.product_id,
+       p.product_name,
+       p.category,
+       SUM(f.quantity) AS units_sold,
+       SUM(f.revenue)  AS revenue
+FROM fact_sales f
+JOIN dim_product p      ON p.product_key = f.product_key
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue
+GROUP BY p.product_id, p.product_name, p.category
+ORDER BY revenue DESC, p.product_id
+LIMIT 10;
+ product_id |      product_name       |   category    | units_sold |   revenue    
+------------+-------------------------+---------------+------------+--------------
+ PRD000297  | Product 297 Cell        | Skincare      |         40 | 302895000.00
+ PRD000309  | Product 309 Ability     | Home Decor    |         43 | 297192000.00
+ PRD000203  | Product 203 Environment | Phones        |         36 | 260936000.00
+ PRD000300  | Product 300 Term        | Sportswear    |         35 | 259776000.00
+ PRD000173  | Product 173 Trade       | Skincare      |         35 | 248452500.00
+ PRD000268  | Product 268 Stuff       | Accessories   |         33 | 247468500.00
+ PRD000204  | Product 204 Realize     | Phones        |         34 | 238183000.00
+ PRD000126  | Product 126 One         | Personal Care |         35 | 236880000.00
+ PRD000238  | Product 238 Character   | Fitness       |         33 | 233859500.00
+ PRD000084  | Product 084 Job         | Home Decor    |         32 | 233227500.00
+(10 rows)
+
+SELECT SUM(f.revenue)                                           AS revenue,
+       COUNT(DISTINCT f.order_id)                               AS orders,
+       ROUND(SUM(f.revenue) / COUNT(DISTINCT f.order_id), 2)    AS aov
+FROM fact_sales f
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue;
+    revenue     | orders |     aov     
+----------------+--------+-------------
+ 48077944000.00 |   3880 | 12391222.68
+(1 row)
+
+SELECT c.customer_segment,
+       COUNT(DISTINCT f.customer_key)                                  AS customers,
+       SUM(f.revenue)                                                  AS revenue,
+       ROUND(SUM(f.revenue) / COUNT(DISTINCT f.customer_key), 2)       AS revenue_per_customer
+FROM fact_sales f
+JOIN dim_customer c     ON c.customer_key = f.customer_key
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue
+GROUP BY c.customer_segment
+ORDER BY revenue DESC;
+ customer_segment | customers |    revenue     | revenue_per_customer 
+------------------+-----------+----------------+----------------------
+ Standard         |       549 | 28241059000.00 |          51440908.93
+ Silver           |       233 | 10975640000.00 |          47105751.07
+ Gold             |       147 |  6854916500.00 |          46632085.03
+ Platinum         |        44 |  2006328500.00 |          45598375.00
+(4 rows)
+
+SELECT c.city                         AS region,
+       COUNT(DISTINCT f.customer_key) AS customers,
+       SUM(f.revenue)                 AS revenue
+FROM fact_sales f
+JOIN dim_customer c     ON c.customer_key = f.customer_key
+JOIN dim_order_status s ON s.order_status_key = f.order_status_key
+WHERE s.is_revenue
+GROUP BY c.city
+ORDER BY customers DESC, region;
+      region      | customers |    revenue    
+------------------+-----------+---------------
+ Bac Ninh         |       111 | 5664023500.00
+ Vinh             |       110 | 5354184500.00
+ Ho Chi Minh City |       109 | 5404917500.00
+ Hai Phong        |        97 | 4549735500.00
+ Can Tho          |        94 | 4785581500.00
+ Da Nang          |        94 | 4707089000.00
+ Hue              |        94 | 4302904500.00
+ Nha Trang        |        91 | 5163161500.00
+ Quang Ninh       |        90 | 4522311000.00
+ Hanoi            |        83 | 3624035500.00
+(10 rows)
+

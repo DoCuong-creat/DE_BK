@@ -1,0 +1,62 @@
+-- Chạy lúc 2026-10-06 17:08 | schema mart
+
+                         Table "mart.dim_date"
+    Column    |         Type          | Collation | Nullable | Default 
+--------------+-----------------------+-----------+----------+---------
+ date_key     | integer               |           | not null | 
+ full_date    | date                  |           | not null | 
+ day_of_month | smallint              |           | not null | 
+ day_of_week  | smallint              |           | not null | 
+ day_name     | character varying(10) |           | not null | 
+ week_of_year | smallint              |           | not null | 
+ month        | smallint              |           | not null | 
+ month_name   | character varying(10) |           | not null | 
+ year_month   | character(7)          |           | not null | 
+ quarter      | smallint              |           | not null | 
+ year         | smallint              |           | not null | 
+ is_weekend   | boolean               |           | not null | 
+Indexes:
+    "dim_date_pkey" PRIMARY KEY, btree (date_key)
+    "dim_date_full_date_key" UNIQUE CONSTRAINT, btree (full_date)
+    "idx_dim_date_year_month" btree (year_month)
+Referenced by:
+    TABLE "mart.fact_sales" CONSTRAINT "fact_sales_date_key_fkey" FOREIGN KEY (date_key) REFERENCES mart.dim_date(date_key)
+
+                                                  Table "mart.fact_sales"
+       Column       |           Type           | Collation | Nullable |                      Default                       
+--------------------+--------------------------+-----------+----------+----------------------------------------------------
+ sales_key          | bigint                   |           | not null | nextval('mart.fact_sales_sales_key_seq'::regclass)
+ order_item_id      | character varying(16)    |           | not null | 
+ order_id           | character varying(12)    |           | not null | 
+ date_key           | integer                  |           | not null | 
+ customer_key       | integer                  |           | not null | 
+ product_key        | integer                  |           | not null | 
+ payment_method_key | smallint                 |           | not null | 
+ order_status_key   | smallint                 |           | not null | 
+ quantity           | integer                  |           | not null | 
+ unit_price         | numeric(12,2)            |           | not null | 
+ gross_amount       | numeric(12,2)            |           | not null | 
+ discount           | numeric(12,2)            |           | not null | 0
+ revenue            | numeric(12,2)            |           | not null | 
+ loaded_at          | timestamp with time zone |           | not null | now()
+Indexes:
+    "fact_sales_pkey" PRIMARY KEY, btree (sales_key)
+    "fact_sales_order_item_id_key" UNIQUE CONSTRAINT, btree (order_item_id)
+    "idx_fact_sales_customer" btree (customer_key)
+    "idx_fact_sales_date" btree (date_key)
+    "idx_fact_sales_order" btree (order_id)
+    "idx_fact_sales_product" btree (product_key)
+    "idx_fact_sales_status" btree (order_status_key)
+Check constraints:
+    "fact_sales_discount_check" CHECK (discount >= 0::numeric)
+    "fact_sales_gross_amount_check" CHECK (gross_amount >= 0::numeric)
+    "fact_sales_quantity_check" CHECK (quantity > 0)
+    "fact_sales_revenue_check" CHECK (revenue >= 0::numeric)
+    "fact_sales_unit_price_check" CHECK (unit_price >= 0::numeric)
+Foreign-key constraints:
+    "fact_sales_customer_key_fkey" FOREIGN KEY (customer_key) REFERENCES mart.dim_customer(customer_key)
+    "fact_sales_date_key_fkey" FOREIGN KEY (date_key) REFERENCES mart.dim_date(date_key)
+    "fact_sales_order_status_key_fkey" FOREIGN KEY (order_status_key) REFERENCES mart.dim_order_status(order_status_key)
+    "fact_sales_payment_method_key_fkey" FOREIGN KEY (payment_method_key) REFERENCES mart.dim_payment_method(payment_method_key)
+    "fact_sales_product_key_fkey" FOREIGN KEY (product_key) REFERENCES mart.dim_product(product_key)
+

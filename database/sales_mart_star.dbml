@@ -1,0 +1,74 @@
+// Sales Data Mart - Star Schema (schema mart)
+// Dán vào https://dbdiagram.io để xem / export PNG.
+// DDL tương ứng: sql/student/04_data_mart.sql
+// Grain fact_sales: one row per order_item
+
+Table mart.dim_date {
+  date_key integer [pk, note: 'YYYYMMDD']
+  full_date date [unique, not null]
+  day_of_month smallint
+  day_of_week smallint
+  day_name varchar(10)
+  week_of_year smallint
+  month smallint
+  month_name varchar(10)
+  year_month char(7)
+  quarter smallint
+  year smallint
+  is_weekend boolean
+}
+
+Table mart.dim_customer {
+  customer_key serial [pk]
+  customer_id varchar(12) [unique, not null]
+  full_name varchar(150)
+  city varchar(100)
+  customer_segment varchar(30)
+  status varchar(20)
+}
+
+Table mart.dim_product {
+  product_key serial [pk]
+  product_id varchar(12) [not null]
+  product_name varchar(200)
+  category_id varchar(10)
+  category varchar(120)
+  parent_category varchar(120)
+  list_price numeric(12,2)
+  cost_price numeric(12,2)
+  status varchar(20)
+  valid_from date [note: 'SCD2 - 04_bonus_scd.sql']
+  valid_to date
+  is_current boolean
+}
+
+Table mart.dim_payment_method {
+  payment_method_key smallserial [pk]
+  payment_method_code varchar(30) [unique, not null]
+  payment_method_name varchar(50)
+}
+
+Table mart.dim_order_status {
+  order_status_key smallserial [pk]
+  status_code varchar(20) [unique, not null]
+  status_name varchar(50)
+  sort_order smallint
+  is_revenue boolean
+}
+
+Table mart.fact_sales {
+  sales_key bigserial [pk]
+  order_item_id varchar(16) [unique, not null]
+  order_id varchar(12) [not null, note: 'degenerate dimension']
+  date_key integer [ref: > mart.dim_date.date_key]
+  customer_key integer [ref: > mart.dim_customer.customer_key]
+  product_key integer [ref: > mart.dim_product.product_key]
+  payment_method_key smallint [ref: > mart.dim_payment_method.payment_method_key]
+  order_status_key smallint [ref: > mart.dim_order_status.order_status_key]
+  quantity integer
+  unit_price numeric(12,2)
+  gross_amount numeric(12,2)
+  discount numeric(12,2)
+  revenue numeric(12,2)
+  loaded_at timestamptz
+}

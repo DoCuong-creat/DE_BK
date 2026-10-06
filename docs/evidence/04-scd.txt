@@ -1,0 +1,140 @@
+-- Chạy lúc 2026-10-06 17:09 | PostgreSQL 16 (ecommerce-postgres)
+-- Nguồn: sql/student/04_bonus_scd.sql (chạy sau 04_data_mart.sql)
+
+SET search_path TO mart, core, public;
+SET
+ALTER TABLE dim_product ADD COLUMN IF NOT EXISTS valid_from DATE    NOT NULL DEFAULT DATE '1900-01-01';
+ALTER TABLE
+ALTER TABLE dim_product ADD COLUMN IF NOT EXISTS valid_to   DATE    NOT NULL DEFAULT DATE '9999-12-31';
+ALTER TABLE
+ALTER TABLE dim_product ADD COLUMN IF NOT EXISTS is_current BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE
+ALTER TABLE dim_product DROP CONSTRAINT IF EXISTS dim_product_product_id_key;
+ALTER TABLE
+CREATE UNIQUE INDEX IF NOT EXISTS uq_dim_product_current
+  ON dim_product(product_id) WHERE is_current;
+CREATE INDEX
+CREATE INDEX IF NOT EXISTS idx_dim_product_id_validity
+  ON dim_product(product_id, valid_from, valid_to);
+CREATE INDEX
+ALTER TABLE dim_product DROP CONSTRAINT IF EXISTS chk_dim_product_validity;
+NOTICE:  constraint "chk_dim_product_validity" of relation "dim_product" does not exist, skipping
+ALTER TABLE
+ALTER TABLE dim_product ADD CONSTRAINT chk_dim_product_validity CHECK (valid_from <= valid_to);
+ALTER TABLE
+UPDATE dim_product dp
+SET valid_from = (p.created_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::DATE
+FROM core.products p
+WHERE p.product_id = dp.product_id
+  AND dp.valid_from = DATE '1900-01-01';
+UPDATE 500
+CREATE OR REPLACE FUNCTION mart.scd2_change_product_price(
+  p_product_id VARCHAR,
+  p_new_price  NUMERIC,
+  p_effective  DATE
+) RETURNS INTEGER AS $func$
+DECLARE
+  v_cur mart.dim_product%ROWTYPE;
+  v_new_key INTEGER;
+BEGIN
+  SELECT * INTO v_cur
+  FROM mart.dim_product
+  WHERE product_id = p_product_id AND is_current
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Không tìm thấy phiên bản current của %', p_product_id;
+  END IF;
+
+  -- Giá không đổi -> không tạo version mới (idempotent).
+  IF v_cur.list_price = p_new_price THEN
+    RETURN v_cur.product_key;
+  END IF;
+
+  IF p_effective <= v_cur.valid_from THEN
+    RAISE EXCEPTION 'Ngày hiệu lực % phải sau valid_from % của version hiện tại',
+      p_effective, v_cur.valid_from;
+  END IF;
+
+  -- (1) đóng version cũ
+  UPDATE mart.dim_product
+  SET valid_to = p_effective - 1,
+      is_current = FALSE
+  WHERE product_key = v_cur.product_key;
+
+  -- (2) thêm version mới, copy thuộc tính khác, đổi giá
+  INSERT INTO mart.dim_product (product_id, product_name, category_id, category, parent_category,
+                                list_price, cost_price, status, valid_from, valid_to, is_current)
+  VALUES (v_cur.product_id, v_cur.product_name, v_cur.category_id, v_cur.category,
+          v_cur.parent_category, p_new_price, v_cur.cost_price, v_cur.status,
+          p_effective, DATE '9999-12-31', TRUE)
+  RETURNING product_key INTO v_new_key;
+
+  RETURN v_new_key;
+END;
+$func$ LANGUAGE plpgsql;
+CREATE FUNCTION
+SELECT product_key, product_id, list_price, valid_from, valid_to, is_current
+FROM dim_product
+WHERE product_id = 'PRD000297'
+ORDER BY valid_from;
+ product_key | product_id | list_price | valid_from |  valid_to  | is_current 
+-------------+------------+------------+------------+------------+------------
+         297 | PRD000297  | 7950000.00 | 2025-02-25 | 9999-12-31 | t
+(1 row)
+
+SELECT mart.scd2_change_product_price(
+         'PRD000297',
+         ROUND((SELECT unit_price FROM core.products WHERE product_id = 'PRD000297') * 1.10, -3),
+         DATE '2026-07-01') AS current_product_key;
+ current_product_key 
+---------------------
+                 501
+(1 row)
+
+SELECT product_key, product_id, list_price, valid_from, valid_to, is_current
+FROM dim_product
+WHERE product_id = 'PRD000297'
+ORDER BY valid_from;
+ product_key | product_id | list_price | valid_from |  valid_to  | is_current 
+-------------+------------+------------+------------+------------+------------
+         297 | PRD000297  | 7950000.00 | 2025-02-25 | 2026-06-30 | f
+         501 | PRD000297  | 8745000.00 | 2026-07-01 | 9999-12-31 | t
+(2 rows)
+
+SELECT dp.product_key, dp.list_price, dp.is_current,
+       COUNT(*) AS fact_rows, SUM(f.revenue) AS revenue
+FROM fact_sales f
+JOIN dim_product dp ON dp.product_key = f.product_key
+WHERE dp.product_id = 'PRD000297'
+GROUP BY dp.product_key, dp.list_price, dp.is_current;
+ product_key | list_price | is_current | fact_rows |   revenue    
+-------------+------------+------------+-----------+--------------
+         297 | 7950000.00 | f          |        37 | 380010000.00
+(1 row)
+
+SELECT x.sale_date, dp.product_key, dp.list_price, dp.is_current
+FROM (VALUES (DATE '2026-06-15'), (DATE '2026-07-10')) AS x(sale_date)
+JOIN dim_product dp
+  ON dp.product_id = 'PRD000297'
+ AND x.sale_date BETWEEN dp.valid_from AND dp.valid_to
+ORDER BY x.sale_date;
+ sale_date  | product_key | list_price | is_current 
+------------+-------------+------------+------------
+ 2026-06-15 |         297 | 7950000.00 | f
+ 2026-07-10 |         501 | 8745000.00 | t
+(2 rows)
+
+SELECT
+  (SELECT COUNT(*) FROM (SELECT product_id FROM dim_product WHERE is_current
+                         GROUP BY product_id HAVING COUNT(*) <> 1) a)   AS products_bad_current,
+  (SELECT COUNT(*) FROM dim_product a JOIN dim_product b
+     ON a.product_id = b.product_id AND a.product_key < b.product_key
+    AND a.valid_from <= b.valid_to AND b.valid_from <= a.valid_to)      AS overlapping_versions,
+  (SELECT COUNT(*) FROM dim_product)                                    AS dim_rows,
+  (SELECT COUNT(DISTINCT product_id) FROM dim_product)                  AS distinct_products;
+ products_bad_current | overlapping_versions | dim_rows | distinct_products 
+----------------------+----------------------+----------+-------------------
+                    0 |                    0 |      501 |               500
+(1 row)
+

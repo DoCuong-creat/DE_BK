@@ -75,6 +75,23 @@ Toàn bộ query nằm trong `../../sql/student/03_cte_window_cohort.sql`, tìm 
 | 2.2 | Query `-- Bonus timeseries 1/2` (MoM, MA 7/30 ngày) | `../../sql/student/03_cte_window_cohort.sql` |
 | 2.2 | Output + nhận xét tháng tăng/giảm mạnh | `03-timeseries.txt` |
 
+## Buổi 04 — Thiết kế & xây dựng Sales Data Mart
+
+DDL + LOAD + VERIFY nằm chung trong `../../sql/student/04_data_mart.sql` (đầu file có `-- GRAIN:`).
+
+| Mục | Yêu cầu | File |
+|---|---|---|
+| 1.1 | DDL 5 dims + fact_sales, comment grain + business logic | `../../sql/student/04_data_mart.sql` |
+| 1.1 | Sơ đồ star schema | `04-star-schema.png` (source DBML: `../../database/sales_mart_star.dbml`) |
+| 1.2 | Log tạo bảng (6 CREATE TABLE, 0 ERROR) | `04-ddl-log.txt` |
+| 1.2 | Ảnh `\d dim_date` + `\d fact_sales` | `04-describe.png` (+ bản text `04-describe.txt`) |
+| 1.3 | Scripts load (`-- LOAD 0` … `-- LOAD 5`) | `../../sql/student/04_data_mart.sql` |
+| 1.3 | Row counts + đối soát revenue OLTP ↔ Mart | `04-rowcounts.txt` |
+| 1.4 | 5 KPI queries (`-- KPI1` … `-- KPI5`) chỉ đọc mart | `../../sql/student/04_kpi_from_mart.sql` |
+| 1.4 | SQL + đáp án số + nhận xét | `../answers_04.md` (output thô: `04-kpi-results.txt`) |
+| 2.1 | SCD Type 2 cho dim_product + demo đổi giá | `../../sql/student/04_bonus_scd.sql`, output `04-scd.txt` |
+| 2.2 | EXPLAIN ANALYZE OLTP vs Mart + bảng ms | `../mart_performance/04-perf.md` |
+
 ---
 
 ## Repo GitHub
